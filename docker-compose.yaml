@@ -1,0 +1,70 @@
+version: "3"
+services:
+  mongos:
+    image: mongo:6.0.3
+    restart: always
+    container_name: mongos
+    volumes:
+        - ./scripts:/scripts
+    command: mongos --configdb confset/config:27017  --port 27017
+    ports:
+      - 27017:27017
+    networks:
+      - mongo-cluster
+  config:
+    image: mongo:6.0.3
+    restart: always
+    container_name: config
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --port 27017 --replSet confset --configsvr
+    networks:
+      - mongo-cluster
+  shard1-primary:
+    image: mongo:6.0.3
+    restart: always
+    container_name: shard1-primary
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --replSet shard1 --shardsvr
+    networks:
+      - mongo-cluster
+  shard1-secondary:
+    image: mongo:6.0.3
+    restart: always
+    container_name: shard1-secondary
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --replSet shard1 --shardsvr
+    networks:
+      - mongo-cluster
+  shard1-arbiter:
+    image: mongo:6.0.3
+    restart: always
+    container_name: shard1-arbiter
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --replSet shard1 --shardsvr
+    networks:
+      - mongo-cluster
+  shard2-primary:
+    image: mongo:6.0.3
+    restart: always
+    container_name: shard2-primary
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --replSet shard2 --shardsvr
+    networks:
+      - mongo-cluster
+  shard3-primary:
+    image: mongo:6.0.3
+    restart: always
+    container_name: shard3-primary
+    volumes:
+        - ./scripts:/scripts
+    command: mongod --replSet shard3 --shardsvr
+    networks:
+      - mongo-cluster
+networks:
+  mongo-cluster:
+    driver: bridge
