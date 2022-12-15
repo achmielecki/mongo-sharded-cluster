@@ -1,0 +1,15 @@
+FROM docker-repo.nowaera.pl/jre17.0.5_8:2022.11.18-master.29/g
+
+RUN apk update && apk add curl && rm -rf /var/lib/apt/lists/*/g
+HEALTHCHECK --interval=30s --timeout=30s CMD curl --fail http://localhost:8080/manage/health || exit 1
+
+ARG DEPENDENCY=build/libs/extracted
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
+
+ENV server.port=8080
+ENV cloud.discovery.enabled=true
+ENTRYPOINT ["java", "-cp", "app:app/lib/*", "pl.nowaera.rscheduler.RschedulerApplication"]
+
+EXPOSE 8080
